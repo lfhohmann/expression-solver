@@ -10,6 +10,7 @@ This module validates and solves expressions for games like "Mathler" and "Nerdl
 
 import re
 
+
 __author__ = "Lucas Hohmann"
 __email__ = "lfhohmann@gmail.com"
 __user__ = "@lfhohmann"
