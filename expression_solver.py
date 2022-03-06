@@ -1,21 +1,96 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+Expressions Solver
+------------------
+
+This module validates and solves expressions for games like "Mathler" and "Nerdle".
+"""
+
 import re
 
+__author__ = "Lucas Hohmann"
+__email__ = "lfhohmann@gmail.com"
+__user__ = "@lfhohmann"
 
-# TODO: Document functions
+__status__ = "Production"
+__date__ = "2022/03/06"
+__version__ = "2.0.0"
+__license__ = "MIT"
+
+
 # TODO: Implement Unit Tests
 
 
 class ExpressionSolver:
-    """Class for solving expressions"""
+    """
+    Solver class
+    ------------
+
+    A class which contains all of the necessary functions to validate and solve
+    the passed expression.
+
+    >>> solver = ExpressionSolver()
+    ... solver.solve("2-278") -> [276]
+    """
 
     def __init__(self, config: dict) -> None:
-        """Initializes the class"""
+        """
+        Init object
+        -----------
+
+        Initializes the object with the passed config.
+
+        Parameters
+        ----------
+
+        #### config : dict (required)
+
+        Dictionary containing the configurations for the rules to validate and
+        solve the expression.
+
+        >>> {
+        ...  "allow_consecutive_sum_and_sub_operators": True,
+        ...  "allow_leading_zeros": False
+        ... }
+
+        Returns
+        -------
+
+        >>> None
+        """
 
         # Set config
         self.config = config
 
     def __is_string_a_number(self, string: str) -> bool:
-        """Helper function to check if the passed string is a number"""
+        """
+        Check if a string is a number
+        --------------
+
+        Checks if a passed string is a number or not.
+
+        Parameters
+        ----------
+
+        #### string : str (required)
+        String containing the characters to be check
+
+        >>> "-1234" -> True
+        >>> "+4321" -> True
+        >>> "12.34" -> False
+        >>> "123ab" -> False
+
+        Returns
+        -------
+
+        #### bool:
+        True or False depending on if the string is a number or not
+
+        >>> True
+        >>> False
+        """
 
         # Try to convert to a number, if it suceeds it's a number
         try:
@@ -27,7 +102,32 @@ class ExpressionSolver:
             return False
 
     def __pre_validate(self, expression: str) -> bool:
-        """Checks if an expression is valid before solving it"""
+        """
+        Check if an expression is valid before solving it
+        --------------
+
+        Checks if a passed expression as a string is valid or not.
+
+        Parameters
+        ----------
+
+        #### expression : str (required)
+        String containing the characters of the expression
+
+        >>> "-12+34*2" -> True
+        >>> "-+2+3*-3" -> True
+        >>> "-1a*2b+6" -> False
+        >>> "+/43-432" -> False
+
+        Returns
+        -------
+
+        #### bool:
+        True or False depending on wheter the string is a number or not
+
+        >>> True
+        >>> False
+        """
 
         # Only allow numbers and operators
         if not re.match(r"^[0-9+-/*]*$", expression):
@@ -59,7 +159,30 @@ class ExpressionSolver:
         return True
 
     def __join_numbers(self, expression: list) -> list:
-        """Joins numbers in the expression"""
+        """
+        Join consecutive numbers
+        --------------
+
+        Joins consecutive number characters in the expression.
+
+        Parameters
+        ----------
+
+        #### expression : list (required)
+        List containing the characters of the expression
+
+        >>> ["1", "2", "3", "+", "3", "2", "1"] -> ["123", "+", "321"]
+        >>> ["1", "2", "+", "3", "*", "-", "2"] -> ["12", "+", "3", "*", "-", "2"]
+
+        Returns
+        -------
+
+        #### list:
+        A list containing the joined numbers
+
+        >>> ["123", "+", "321"]
+        >>> ["12", "+", "3", "*", "-", "2"]
+        """
 
         # Init temporary string and index number
         temp = ""
@@ -91,7 +214,31 @@ class ExpressionSolver:
         return expression
 
     def __join_operators(self, expression: list) -> list:
-        """Joins consecutive "+" and "-" operators in the equation"""
+        """
+        Join "+" and "-" operators
+        --------------
+
+        Joins consecutive "+" and "-" operators in the expression.
+
+        Parameters
+        ----------
+
+        #### expression : list (required)
+        List containing the elements of the expression
+
+        >>> ["123", "+",  "-", "321"] -> ["123", "-", "321"]
+        >>> ["12", "+", "3", "*", "-", "-", "2"] -> ["12", "+", "3", "*", "+", "2"]
+
+        Returns
+        -------
+
+        #### list:
+        A list containing the elements of the expression with the joined
+        operators
+
+        >>> ["123", "+", "321"]
+        >>> ["12", "+", "3", "*", "-", "2"]
+        """
 
         # Init index
         i = 1
@@ -125,7 +272,31 @@ class ExpressionSolver:
         return expression
 
     def __join_numbers_to_operators(self, expression: list) -> list:
-        """Joins "+" and "-" operators to their following numbers"""
+        """
+        Join operators to numbers
+        --------------
+
+        Joins "+" and "-" operators to their following numbers.
+
+        Parameters
+        ----------
+
+        #### expression : list (required)
+        List containing the elements of the expression
+
+        >>> ["123", "-", "321"] -> ["123", "-321"]
+        >>> ["12", "+", "3", "*", "+", "2"] -> ["12", "+3", "*", "+2"]
+
+        Returns
+        -------
+
+        #### list:
+        A list containing the elements of the expression with the joined
+        operators to numbers
+
+        >>> ["123", "-321"]
+        >>> ["12", "+3", "*", "+2"]
+        """
 
         # Init index
         i = 1
@@ -146,23 +317,32 @@ class ExpressionSolver:
         # Return the expression
         return expression
 
-    def __check_for_divisions_by_zero(self, expression: list) -> bool:
-        """Checks if an expression contains divisions by zero"""
-
-        # Loop through the expression comparing to element at a time
-        for i in range(1, len(expression)):
-
-            # Check if the previous element is a division operator and the current element is zero
-            if expression[i - 1] == "/" and expression[i] == 0:
-
-                # Return False if there is a division by zero
-                return False
-
-        # Return True if there are no divisions by zero
-        return True
-
     def __convert_numbers_to_ints(self, expression: list) -> list:
-        """Converts the numbers from strings into integers"""
+        """
+        Strings to ints
+        --------------
+
+        Converts the numbers from strings into integers.
+
+        Parameters
+        ----------
+
+        #### expression : list (required)
+        List containing the elements of the expression
+
+        >>> ["123", "+0"] -> [123, 0]
+        >>> ["12", "3", "*", "2"] -> [12, 3, "*", 2]
+
+        Returns
+        -------
+
+        #### list:
+        A list containing the elements of the expression with numbers converted
+        to integers
+
+        >>> [123, 0]
+        >>> [12, 3, "*", 2]
+        """
 
         # Loop through the expression
         for i in range(len(expression)):
@@ -176,8 +356,73 @@ class ExpressionSolver:
         # Return the expression
         return expression
 
+    def __check_for_divisions_by_zero(self, expression: list) -> bool:
+        """
+        Check divisions by zero
+        --------------
+
+        Checks if the expression contains divisions by zero.
+
+        Parameters
+        ----------
+
+        #### expression : list (required)
+        List containing the elements of the expression
+
+        >>> [123, "/", 0] -> True
+        >>> [12, 3, "*", 2] -> False
+
+        Returns
+        -------
+
+        #### bool:
+        True if the expression contains divisions by zero, False otherwise
+
+        >>> True
+        >>> False
+        """
+
+        # Loop through the expression comparing to element at a time
+        for i in range(1, len(expression)):
+
+            # Check if the previous element is a division operator and the current element is zero
+            if expression[i - 1] == "/" and expression[i] == 0:
+
+                # Return False if there is a division by zero
+                return True
+
+        # Return True if there are no divisions by zero
+        return False
+
     def __solve_div_and_mul_operators(self, expression: list) -> list:
-        """Solves divisions and multiplications"""
+        """
+        Solve "/" and "*"
+        --------------
+
+        Solves division and multiplication operations, it also checks if the
+        result of the divisions are integers.
+
+        Parameters
+        ----------
+
+        #### expression : list (required)
+        List containing the elements of the expression
+
+        >>> [4, 124, "/", 2, "*", 4] -> [4, 248]
+        >>> [12, 3, "*", 2] -> [12, 6]
+        >>> [4, 124, "/", 3, "*", 4] -> []
+
+        Returns
+        -------
+
+        #### list:
+        A list containing the result of the operations with the elements of
+        the expression
+
+        >>> [4, "+", 248]
+        >>> [12, 6]
+        >>> []
+        """
 
         # Init index
         i = 1
@@ -191,6 +436,10 @@ class ExpressionSolver:
                 # Perform the appropriate operation
                 if expression[i] == "/":
                     expression[i - 1] /= expression[i + 1]
+
+                    # Check if the division results in an integer
+                    if not expression[i - 1] % 1 == 0:
+                        return []
 
                 else:
                     expression[i - 1] *= expression[i + 1]
@@ -207,12 +456,68 @@ class ExpressionSolver:
         return expression
 
     def __sum_elements(self, expression: list) -> list:
-        """Sums all of the elements in the expression"""
+        """
+        Sum elements
+        --------------
 
-        return [int(sum(expression))]
+        Sums all of the elements in the expression.
+
+        Parameters
+        ----------
+
+        #### expression : list (required)
+        List containing the elements of the expression
+
+        >>> [4, "+", 248] -> [252]
+        >>> [12, 6] -> [18]
+        >>> [] -> []
+
+        Returns
+        -------
+
+        #### list:
+        A list containing the result of the sum of the elements as a single
+        number
+
+        >>> [252]
+        >>> [18]
+        >>> []
+        """
+
+        # Return sum only if list is not empty
+        if expression:
+            return [int(sum(expression))]
+
+        else:
+            return []
 
     def solve(self, expression: str) -> list:
-        """Solves an expression and returns the solution as a list, if invalid returns an empty list"""
+        """
+        Solve expression
+        --------------
+
+        Validates and solves an expression and returns the solution as a list,
+        if invalid returns an empty list.
+
+        Parameters
+        ----------
+
+        #### expression : str (required)
+        A string representing the expression to be solved
+
+        >>> "4+254/2" -> [131]
+        >>> "234/0" -> []
+
+        Returns
+        -------
+
+        #### list:
+        A list containing the result of the sum of the elements as a single
+        number
+
+        >>> [131]
+        >>> []
+        """
 
         # Check if the expression is valid
         if not self.__pre_validate(expression):
@@ -228,7 +533,7 @@ class ExpressionSolver:
         expression = self.__convert_numbers_to_ints(expression)
 
         # Check if the expression has any divisions by zero
-        if not self.__check_for_divisions_by_zero(expression):
+        if self.__check_for_divisions_by_zero(expression):
             return []
 
         # Perform the following steps on the expression
